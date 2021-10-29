@@ -37,18 +37,18 @@ def client_handler(client):
 def receive():                                                          
     while True:
         client, address = server.accept()
-        print("Connected with {}".format(str(address)))   
+        print("New user IP and Port: {}".format(str(address)))   
 
         client.send('USERNAME'.encode('ascii'))
         username = client.recv(1024).decode('ascii')
         usernameList.append(username)
         clientList.append(client)
-        print("Username is {}".format(username))
+        print("New user's username is {}".format(username))
         
         #TODO give each user unique id, probably set id to a counter
         
-        send_message("{} joined".format(username).encode('ascii'))
-        client.send('Connected to server'.encode('ascii'))
+        send_message("New user {} joined".format(username).encode('ascii'))
+        client.send('You have connected to server'.encode('ascii'))
         thread = threading.Thread(target=client_handler, args=(client,))
         thread.start()
 
