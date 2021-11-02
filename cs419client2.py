@@ -11,9 +11,9 @@ def receive_message():
     while True:                                                 
         #make connection, send username if applicable, else print message 
         try:
-            message = client.recv(1024).decode('ascii')
+            message = client.recv(1024).decode('utf-8')
             if message == 'USERNAME':
-                client.send(username.encode('ascii'))
+                client.send(username.encode('utf-8'))
             else:
                 print(message)
         #error, wrong ip or port
@@ -25,7 +25,7 @@ def receive_message():
 def write_message():
     while True:                                                 
         message = '{}: {}'.format(username, input(''))
-        client.send(message.encode('ascii'))
+        client.send(message.encode('utf-8'))
 
 #reveive messages
 receive_thread = threading.Thread(target=receive_message)               
