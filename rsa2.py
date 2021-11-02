@@ -76,6 +76,15 @@ def main():
     print(c)
     m2 = rsa_decrypt_message(c, d, n)
     print(m2)
+    m2 = [str(x) for x in m2]
+    m2 = ''.join(m2)
+    m2 = int(m2)
+    m2 = m2.to_bytes((m2.bit_length() + 7) // 8, 'big').decode('utf-8')
+    print(m2)
+    # b = m2.to_bytes(, 'big')
+    # b = b.decode('utf-8')
+    # print(b)
+    
 
 
 
