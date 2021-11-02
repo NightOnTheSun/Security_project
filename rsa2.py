@@ -1,6 +1,7 @@
 from Crypto.Util.number import getPrime
 from functools import lru_cache
 import numpy as np 
+import sys 
 
 def gen_p_q():
     return getPrime(512), getPrime(512)
@@ -45,15 +46,23 @@ def encrypt_block(m, e, n):
 def decrypt_block(c, d, n):
     return pow(c, d, n)
 
-def encrypt(m, e, n):
-    print(m.to_bytes(n.bit_length() // 8, 'big').hex())
-    blocks = [encrypt_block(m, e, n) for m in m.to_bytes(n.bit_length() // 8, 'big')]
-    # print(blocks)
-    return bytes(blocks)
+def rsa_encrypt_message(m, e, n):
+    blocks = [int(x) for x in str(m)]
+    c = []
+    for block in blocks:
+        c.append(encrypt_block(block, e, n))
+    return c
 
-def decrypt(c, d, n):
-    blocks = [decrypt_block(c, d, n) for c in c.to_bytes(n.bit_length() // 8, 'big')]
-    return bytes(blocks)
+def rsa_decrypt_message(c, d, n):
+    blocks = [int(x) for x in c]
+    m = []
+    for block in blocks:
+        m.append(decrypt_block(block, d, n))
+    return m
+
+
+
+
 
 def main():
     p, q = gen_p_q()
@@ -61,10 +70,11 @@ def main():
     phi = gen_phi(p, q)
     e = gen_e(phi)
     d = gen_d(e, phi)
-    m = int.from_bytes(b'poof', 'big')
-    c = encrypt(m, e, n)
-    # print(c)
-    m2 = decrypt(c, d, n)
+    m = int.from_bytes(b'boom', 'big')
+    print(m)
+    c = rsa_encrypt_message(m, e, n)
+    print(c)
+    m2 = rsa_decrypt_message(c, d, n)
     print(m2)
 
 
