@@ -111,7 +111,7 @@ def signup(username, password):
         f.write(str(private_key))
     # hash the password since we don't want server to know the password 
     # is this safer to do on our end or server end?
-    database.insert_user(username, hash_password(password), public_key)
+    database.insert_user({'username': username, 'password' : hash_password(password), 'public key' :public_key })
     
     
     
