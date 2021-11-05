@@ -1,10 +1,28 @@
 from Crypto.Util.number import getPrime
 from functools import lru_cache
 import numpy as np 
-import sys 
+import sys
+from Security_project.mongo import mongodb_atlas_test 
+from monggo import *
+import hashlib
+
+"""
+(n,e) = public_key
+(n,d) = private_key
+p, q = large prime numbers 
+phi = (p - 1) * (q - 1) = totient function 
+d = mod_inv_euclid_extended(e, phi)
+-----------
+we keep d and n locally, and hidden in a file or something 
+we push n and d to the mongo server 
+"""
 
 def gen_p_q():
-    return getPrime(512), getPrime(512)
+    while True:
+        p = getPrime(512)
+        q = getPrime(512)
+        if p != q:
+            return p, q
 
 def gen_n(p, q):
     return p * q
@@ -25,12 +43,14 @@ def gcd_euclid(a, b):
         return a
     return gcd_euclid(b, a % b)
 
+@lru_cache(maxsize=None)
 def gcd_euclid_extended(a, b):
     if b == 0:
         return 1, 0, a
     x, y, d = gcd_euclid_extended(b, a % b)
     return y, x - (a // b) * y, d
 
+@lru_cache(maxsize=None)
 def mod_inv_euclid_extended(a, m):
     x, y, d = gcd_euclid_extended(a, m)
     if d == 1:
@@ -61,8 +81,40 @@ def rsa_decrypt_message(c, d, n):
     return m
 
 
+"""
+--------------------------------------------------------------------------------
+---------------------------- This is for the signup ----------------------------
+--------------------------------------------------------------------------------
+"""
+def gen_public_key():
+    p, q = gen_p_q()
+    n = gen_n(p, q)
+    phi = gen_phi(p, q)
+    e = gen_e(phi)
+    return (n, e), e
+def gen_private_key(n, e):
+    d = gen_d(e, n)
+    return (n, d)
 
+database = mongodb_atlas_test()
 
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def signup(username, password):
+    public_key, e = gen_public_key()
+    private_key = gen_private_key(public_key[0], e)
+    print(public_key)
+    print(private_key)
+    with open('keys.txt', 'w') as f:
+        f.write(str(public_key) + '\n')
+        f.write(str(private_key))
+    # hash the password since we don't want server to know the password 
+    # is this safer to do on our end or server end?
+    database.insert_user(username, hash_password(password), public_key)
+    
+    
+    
 
 def main():
     p, q = gen_p_q()

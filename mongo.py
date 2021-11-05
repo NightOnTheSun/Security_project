@@ -10,7 +10,7 @@ class mongodb_atlas_test:
         TODO: This client connection string needs to probabaly be secured. Need to figure out what 
         the best way to do this is.
         """
-        self.client = pymongo.MongoClient('ASK ME ')
+        self.client = pymongo.MongoClient('TEST')
         self.db = self.client.myFirstDatabase
         self.collection = self.db.user_info
 
